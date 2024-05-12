@@ -26,8 +26,24 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+input [type = "number" ] {
+  -moz-appearance : textfield ;
+}
+
+input ::-webkit-outer-spin-button ,
+input  ::-webkit-inner-spin-button {
+  -webkit-appearance: none ;
+  margin: 0;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@layer base {
+  html {
+    @apply text-white;
+  } 
 }
