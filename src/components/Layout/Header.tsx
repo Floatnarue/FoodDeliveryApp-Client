@@ -6,7 +6,7 @@ import NavItems from '../NavBar/NavItems';
 import ProfileDropdown from '../NavBar/ProfileDropdown';
 const Header = () => {
   return (
-    <header className='w-full h-[70px] bg-[#0F1524]'>
+    <header className='w-full bg-[#0A0713]'>
         <div className=" w-[90%] m-auto flex items-center justify-between ">
             <h1 className={`${styles.logo}`}>
                 Floatnarue

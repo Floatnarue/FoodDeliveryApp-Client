@@ -1,21 +1,23 @@
 "use client";
 
-import {DocumentNode, gql } from "@apollo/client";
+import { DocumentNode, gql } from "@apollo/client";
 
 
 
-export const LOGIN_USER : DocumentNode= gql`
+export const LOGIN_USER: DocumentNode = gql`
 mutation LoginUser(
-    $email : String!
+    $email : String!,
     $password : String!
 ) {
     Login(
-        email : $email , password : $password 
+        email : $email
+        password : $password 
     ) {
         user {
             id
             name 
             email
+            password
             phone_number
             address
             

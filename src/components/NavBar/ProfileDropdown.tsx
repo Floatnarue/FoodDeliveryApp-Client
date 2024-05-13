@@ -4,22 +4,53 @@
 import useUser from '@/src/hooks/useUser';
 import AuthScreen from '@/src/screens/AuthScreen';
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CgProfile } from "react-icons/cg";
-
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
+import { useSession, signIn, signOut } from 'next-auth/react'
+import { registerUser } from '@/src/actions/register-user';
 const ProfileDropdown = () => {
     const [signedIn, setSignedIn] = useState(false);
-    const [open , setOpen] = useState(false ) ;
-    const {user,loading} = useUser();
-    console.log(user)
-    
+    const [open, setOpen] = useState(false);
+    const { user, loading } = useUser();
+    const { data } = useSession();
+    console.log("🚀 ~ ProfileDropdown ~ user:", user)
+
+    useEffect(() => {
+        if (!loading) {
+            setSignedIn(!!user);
+        }
+        if (data?.user) {
+            setSignedIn(true);
+            addUsers(data?.user);
+        }
+
+    }, [loading, user, open, data]);
+
+
+    const LogoutHandler = () => {
+        if (data?.user) {
+            signOut();
+        } else {
+            Cookies.remove("access_token");
+            Cookies.remove("refresh_token");
+            toast.success("Log out successful!");
+            window.location.reload();
+        }
+    };
+
+    const addUsers = async (user: any) => {
+        await registerUser(user);
+    }
+
     return (
         <div className='flex items-center gap-4'>
             {signedIn ? (
                 <Dropdown placement='bottom-end'>
                     <DropdownTrigger>
                         <Avatar as='button' className='transition-transform'
-                            src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+                            src={data?.user ? data.user.image : user.image} />
                     </DropdownTrigger>
                     <DropdownMenu aria-label='Profile Actions' variant='flat'>
                         <DropdownItem key='profile' className='h-14 gap-2'>
@@ -27,7 +58,7 @@ const ProfileDropdown = () => {
                                 Sign in as
                             </p>
                             <p className='font-semibold '>
-                                support@floatnarue.com
+                                {data?.user ? data.user.email : user.email}
                             </p>
                         </DropdownItem>
                         <DropdownItem key='setting' className='h-14 gap-2'>
@@ -42,26 +73,29 @@ const ProfileDropdown = () => {
                         <DropdownItem key='setting' className='h-14 gap-2'>
                             Setting
                         </DropdownItem>
-                        <DropdownItem key='setting' className='h-14 gap-2'>
+                        <DropdownItem key='setting'
+                            className='h-14 gap-2'
+                            onClick={() => signOut() || LogoutHandler}
+                        >
                             Logout
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             ) : (
-                <CgProfile 
-                className='text-2xl cursor-pointer'
-                onClick={() => setOpen(!open)}
+                <CgProfile
+                    className='text-2xl cursor-pointer'
+                    onClick={() => setOpen(!open)}
                 />
             )}
 
             {
                 open && (
-                    <AuthScreen setOpen = {setOpen}/>
+                    <AuthScreen setOpen={setOpen} />
                 )
 
             }
 
-            
+
         </div>
     )
 }

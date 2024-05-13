@@ -9,6 +9,7 @@ import { useMutation } from '@apollo/client'
 import { LOGIN_USER } from '@/src/graphql/actions/login.action'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
+import { signIn } from 'next-auth/react'
 
 
 const formSchema = z.object({
@@ -29,7 +30,8 @@ const Login = ({ setActiveState, setOpen }: {
     setOpen: (e: boolean) => void;
 }) => {
 
-    const [LoginUser, { loading, error, data }] = useMutation(LOGIN_USER);
+    const [LoginUser, { loading }] = useMutation(LOGIN_USER);
+    
 
     const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<LoginSchema>(
         {
@@ -42,30 +44,32 @@ const Login = ({ setActiveState, setOpen }: {
             email: data.email,
             password: data.password,
         };
-
-
+        console.log("🚀 ~ onSubmit ~ loginData:", loginData)
+        
+        
         const response = await LoginUser({
             variables: loginData,
         });
 
-        console.log(response)
+
+        console.log(response.data)
+        
         if (response.data.Login.user) {
 
             toast.success("Login successful!")
-
             // store our token in cookies
             Cookies.set("access_token", response.data.Login.accessToken)
             Cookies.set("refresh_token", response.data.Login.refreshToken)
             setOpen(false);
             reset();
-            window.location.reload();
+            //window.location.reload();
         }
         else {
-            
+
             toast.error(response.data.Login.error.message);
 
         }
-        
+
     }
 
     const [showPassword, setShowPassword] = useState(false)
@@ -74,6 +78,7 @@ const Login = ({ setActiveState, setOpen }: {
     return (
         <div>
             <br />
+            
             <h1 className={`${styles.title}`}>Login</h1>
             <br />
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -137,12 +142,17 @@ const Login = ({ setActiveState, setOpen }: {
                         disabled={isSubmitting || loading}
                         className={`${styles.button} mt-3`}
                     />
-                    <span className={`${styles.label} mt-5 text-[#4740ca] block text-center cursor-pointer`}>Forget your password</span>
+                    <span 
+                    className={`${styles.label} text-[#2190ff] block text-right cursor-pointer`}
+                    onClick={() => setActiveState("forgotPassword")}
+                    >Forget your password</span>
                 </div>
                 <h5 className='text-center pt-4 font-Poppins text-[12px] text-white'>Or join us with</h5>
-                <div className='flex items-center justify-center my-3 '>
+                <div 
+                className='flex items-center justify-center my-3 '
+                onClick={() => signIn()}
+                >
                     <FcGoogle size={30} className='cursor-pointer mr-2' />
-                    <AiFillGithub size={30} className='cursor-pointer ml-2' />
 
                 </div>
                 <h5 className='text-center pt-4 font-Poppins text-[12px]'>

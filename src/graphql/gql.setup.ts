@@ -9,16 +9,15 @@ const httpLink = createHttpLink ({
 /// SetUp middle ware before access GraphQL to sent token from cookies as well
 // => to check auth
 
-const authMiddleware = new ApolloLink((oparetion,forward) => {
+const authMiddleware = new ApolloLink((oparetion, forward) => {
     oparetion.setContext({
-        headers: {
-            accessToken : Cookies.get("access_token"),
-            refreshToken : Cookies.get("refresh_token"),
-        }
+      headers: {
+        accesstoken: Cookies.get("access_token"),
+        refreshtoken: Cookies.get("refresh_token"),
+      },
     });
-
-    return forward(oparetion)
-})
+    return forward(oparetion);
+  });
 
 export const grapqlClient = new ApolloClient (
     {
